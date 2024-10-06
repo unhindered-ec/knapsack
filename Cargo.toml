@@ -1,0 +1,8 @@
+[package]
+name = "knapsack"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ec-core = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "dce7338aa6861ddc31e1f7c0601c1bf7fc3df664" }
+ec-linear = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "dce7338aa6861ddc31e1f7c0601c1bf7fc3df664" }
