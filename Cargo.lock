@@ -119,6 +119,7 @@ dependencies = [
 name = "knapsack"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "ec-core",
  "ec-linear",
  "thiserror",
