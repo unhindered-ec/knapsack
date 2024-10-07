@@ -1,38 +1,41 @@
+use anyhow::{anyhow, Context};
 use std::{
     fs::File,
     io::{self, BufRead},
-    num::ParseIntError,
-    path::{Path, PathBuf},
+    path::Path,
     str::FromStr,
 };
 
-use crate::item::{Item, ItemParseError};
+use crate::item::Item;
 
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-    #[error(transparent)]
-    Io(#[from] io::Error),
-
-    #[error("Tried to parse empty file")]
-    EmptyFile(PathBuf),
-
-    #[error(transparent)]
-    IllegalNumberOfItems(#[from] ParseIntError),
-
-    #[error(transparent)]
-    ItemParse(#[from] ItemParseError),
-
-    #[error("No capacity line")]
-    NoCapacity,
-}
-
+#[derive(Debug)]
 pub struct Knapsack {
     items: Vec<Item>,
     capacity: usize,
 }
 
 impl Knapsack {
-    pub fn from_file_path(file_path: impl AsRef<Path>) -> Result<Self, self::Error> {
+    pub fn items(&self) -> &[Item] {
+        &self.items
+    }
+
+    pub fn num_items(&self) -> usize {
+        self.items.len()
+    }
+
+    pub fn get_item(&self, index: usize) -> Option<&Item> {
+        self.items.get(index)
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Item> {
+        self.items.iter()
+    }
+
+    pub const fn capacity(&self) -> usize {
+        self.capacity
+    }
+
+    pub fn from_file_path(file_path: impl AsRef<Path>) -> anyhow::Result<Self> {
         let file = File::open(file_path.as_ref())?;
         let reader = io::BufReader::new(file);
 
@@ -42,25 +45,46 @@ impl Knapsack {
         let mut line_iter = reader.lines();
         let num_items = line_iter
             .next()
-            .ok_or(Error::EmptyFile(file_path.as_ref().to_owned()))??
+            .ok_or_else(|| anyhow!("The input file {:?} was empty", file_path.as_ref()))??
             .parse::<usize>()?;
         let items = line_iter
             .by_ref()
             .take(num_items)
-            // The items from `take` are `Result` and we have to deal with that
-            // before (or during) `map`.
-            .map(Item::from_str)
-            .collect::<Result<Vec<_>, _>>()?;
-
+            .map(|item_line_result| {
+                let line_str = item_line_result
+                    .context("Error reading line from knapsack specification file")?;
+                Item::from_str(&line_str)
+            })
+            .collect::<anyhow::Result<Vec<_>>>()?;
         let capacity = line_iter
             .next()
-            .ok_or(Error::NoCapacity)??
+            .ok_or_else(|| anyhow!(
+                "There was no capacity line in the input file {:?}\nThis might be because the number of items was set incorrectly.",
+                file_path.as_ref()
+            ))??
             .parse::<usize>()?;
 
-        Ok(Knapsack {
+        Ok(Self {
             items,
             capacity,
             // Initialize fields
         })
+    }
+}
+
+#[expect(clippy::unwrap_used, reason = ".unwrap() is reasonable in tests")]
+#[cfg(test)]
+mod test {
+    use super::Knapsack;
+    use crate::item::Item;
+
+    #[test]
+    fn parse_from_file_path() {
+        let knapsack = Knapsack::from_file_path("knapsacks/tiny.txt").unwrap();
+        assert_eq!(knapsack.num_items(), 3);
+        assert_eq!(knapsack.get_item(0), Some(&Item::new(1, 3, 8)));
+        assert_eq!(knapsack.get_item(1), Some(&Item::new(2, 2, 8)));
+        assert_eq!(knapsack.get_item(2), Some(&Item::new(3, 9, 1)));
+        assert_eq!(knapsack.capacity(), 10);
     }
 }

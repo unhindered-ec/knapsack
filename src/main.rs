@@ -5,12 +5,13 @@ mod run_error;
 // use ec_core::operator::selector::lexicase::Lexicase;
 // use ec_linear::recombinator::uniform_xo::UniformXo;
 use knapsack::Knapsack;
-use run_error::RunError;
 
 // Turn some of this into CLI arguments.
 
-fn main() -> Result<(), RunError> {
-    let knapsack = Knapsack::from_file_path("simple.txt");
+fn main() -> anyhow::Result<()> {
+    let knapsack = Knapsack::from_file_path("knapsacks/tiny.txt")?;
+
+    println!("{knapsack:?}");
 
     // let run = Run::new(knapsack)
     //     .with_scorer(CliffScorer::new(knapsack))
