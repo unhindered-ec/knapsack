@@ -1,7 +1,13 @@
 [package]
 name = "knapsack"
 version = "0.1.0"
+authors = ["Nic McPhee", "Justus Flügel", "Many cool people on Twitch"]
 edition = "2021"
+description = "An example of implementing the 0-1 Knapsack problem using the unhindered-ec library"
+repository = "https://github.com/unhindered-ec/knapsack.git"
+license = "MIT OR Apache-2.0"
+keywords = ["0-1 knapsack", "linear GA", "bitstring", "unhindered-ec"]
+categories = ["evolutionary computation", "genetic algorithms", "combinatorial optimization"]
 
 [dependencies]
 anyhow = "1.0.89"
