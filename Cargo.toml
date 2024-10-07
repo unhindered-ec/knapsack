@@ -1,8 +1,66 @@
 [package]
 name = "knapsack"
 version = "0.1.0"
+authors = ["Nic McPhee", "Justus Flügel", "Many cool people on Twitch"]
 edition = "2021"
+description = "An example of implementing the 0-1 Knapsack problem using the unhindered-ec library"
+repository = "https://github.com/unhindered-ec/knapsack.git"
+license = "MIT OR Apache-2.0"
+keywords = ["0-1 knapsack", "linear GA", "bitstring", "unhindered-ec"]
+categories = ["evolutionary computation", "genetic algorithms", "combinatorial optimization"]
 
 [dependencies]
+anyhow = "1.0.89"
 ec-core = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "dce7338aa6861ddc31e1f7c0601c1bf7fc3df664" }
 ec-linear = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "dce7338aa6861ddc31e1f7c0601c1bf7fc3df664" }
+thiserror = "1.0.64"
+
+[lints.clippy]
+# Lint groups
+# These have a priority of -1 to ensure that individual
+# Lints override them, if present.
+pedantic = { level =  "warn", priority = -1 }
+nursery = { level =  "warn", priority = -1 }
+cargo = { level =  "warn", priority = -1 }
+perf = { level =  "warn", priority = -1 }
+complexity = { level =  "warn", priority = -1 }
+correctness = { level =  "deny", priority = -1 }
+style = { level =  "warn", priority = -1 }
+
+# Individual lints
+dbg_macro = "warn"
+clone_on_ref_ptr = "warn"
+empty_enum_variants_with_brackets = "warn"
+empty_structs_with_brackets = "warn"
+error_impl_error = "warn"
+format_push_string = "warn"
+if_then_some_else_none = "warn"
+infinite_loop = "warn"
+rc_buffer = "warn"
+rc_mutex = "warn"
+redundant_type_annotations = "warn"
+rest_pat_in_fully_bound_structs = "warn"
+self_named_module_files = "deny"
+suspicious_xor_used_as_pow = "warn"
+tests_outside_test_module = "deny"
+todo = "warn"
+try_err = "warn"
+unnecessary_safety_comment = "warn"
+unnecessary_safety_doc = "warn"
+unnecessary_self_imports = "warn"
+unneeded_field_pattern = "warn"
+arithmetic_side_effects = "warn"
+
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+module_name_repetitions = "allow"
+as_conversions = "deny"
+
+# these lints rely on the lint reasons rfc
+# https://github.com/rust-lang/rust/issues/54503
+# and will become active once that is in stable.
+# We should get ample warning with the nightly & beta
+# ci builds if we need to change anything
+allow_attributes_without_reason = "warn"
+allow_attributes = "deny"
