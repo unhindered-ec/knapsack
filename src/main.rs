@@ -1,3 +1,4 @@
+mod cliff_scorer;
 mod item;
 mod knapsack;
 mod run_error;
