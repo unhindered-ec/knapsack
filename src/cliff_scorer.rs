@@ -4,19 +4,19 @@ use ec_linear::genome::bitstring::Bitstring;
 use crate::knapsack::Knapsack;
 
 #[derive(Debug, PartialEq, Eq)]
-enum CliffScore {
+pub enum CliffScore {
     Score(u64),
     Overloaded,
 }
 
 // We'll need to impl `PartialOrd` and `Ord` on `CliffScore`.
 
-struct CliffScorer {
+pub struct CliffScorer {
     knapsack: Knapsack,
 }
 
 impl CliffScorer {
-    fn new(knapsack: Knapsack) -> Self {
+    pub fn new(knapsack: Knapsack) -> Self {
         Self { knapsack }
     }
 }
