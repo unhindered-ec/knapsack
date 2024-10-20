@@ -1,13 +1,7 @@
 use ec_core::individual::scorer::Scorer;
 use ec_linear::genome::bitstring::Bitstring;
 
-use crate::knapsack::Knapsack;
-
-#[derive(Debug, PartialEq, Eq)]
-enum CliffScore {
-    Score(u64),
-    Overloaded,
-}
+use crate::{cliff_score::CliffScore, knapsack::Knapsack};
 
 // We'll need to impl `PartialOrd` and `Ord` on `CliffScore`.
 
@@ -42,7 +36,7 @@ mod tests {
     use ec_core::individual::scorer::Scorer;
     use ec_linear::genome::bitstring::Bitstring;
 
-    use crate::{cliff_scorer::CliffScore, item::Item, knapsack::Knapsack};
+    use crate::{cliff_score::CliffScore, item::Item, knapsack::Knapsack};
 
     use super::CliffScorer;
 

@@ -1,3 +1,4 @@
+mod cliff_score;
 mod cliff_scorer;
 mod item;
 mod knapsack;
