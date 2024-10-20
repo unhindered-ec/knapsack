@@ -11,7 +11,7 @@ use crate::item::Item;
 #[derive(Debug)]
 pub struct Knapsack {
     items: Vec<Item>,
-    capacity: usize,
+    capacity: u64,
 }
 
 impl Knapsack {
@@ -31,7 +31,7 @@ impl Knapsack {
         self.items.iter()
     }
 
-    pub const fn capacity(&self) -> usize {
+    pub const fn capacity(&self) -> u64 {
         self.capacity
     }
 
@@ -62,13 +62,9 @@ impl Knapsack {
                 "There was no capacity line in the input file {:?}\nThis might be because the number of items was set incorrectly.",
                 file_path.as_ref()
             ))??
-            .parse::<usize>()?;
+            .parse()?;
 
-        Ok(Self {
-            items,
-            capacity,
-            // Initialize fields
-        })
+        Ok(Self { items, capacity })
     }
 }
 
