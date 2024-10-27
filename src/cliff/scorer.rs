@@ -1,22 +1,15 @@
+use super::score::CliffScore;
 use ec_core::individual::scorer::Scorer;
 use ec_linear::genome::bitstring::Bitstring;
 
 use crate::knapsack::Knapsack;
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum CliffScore {
-    Score(u64),
-    Overloaded,
-}
-
-// We'll need to impl `PartialOrd` and `Ord` on `CliffScore`.
 
 pub struct CliffScorer {
     knapsack: Knapsack,
 }
 
 impl CliffScorer {
-    pub fn new(knapsack: Knapsack) -> Self {
+    pub const fn new(knapsack: Knapsack) -> Self {
         Self { knapsack }
     }
 }
@@ -42,7 +35,7 @@ mod tests {
     use ec_core::individual::scorer::Scorer;
     use ec_linear::genome::bitstring::Bitstring;
 
-    use crate::{cliff_scorer::CliffScore, item::Item, knapsack::Knapsack};
+    use crate::{cliff::score::CliffScore, item::Item, knapsack::Knapsack};
 
     use super::CliffScorer;
 

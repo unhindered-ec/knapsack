@@ -1,10 +1,10 @@
-mod cliff_scorer;
+mod cliff;
 mod item;
 mod knapsack;
 mod run;
 mod run_error;
 
-use cliff_scorer::CliffScorer;
+use cliff::CliffScorer;
 use ec_core::operator::selector::tournament::Tournament;
 use ec_linear::mutator::with_one_over_length::WithOneOverLength;
 use knapsack::Knapsack;
