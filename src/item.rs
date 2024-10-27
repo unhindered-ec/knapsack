@@ -1,4 +1,4 @@
-use anyhow::ensure;
+use miette::IntoDiagnostic;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -27,14 +27,15 @@ impl Item {
 }
 
 impl FromStr for Item {
-    type Err = anyhow::Error;
+    type Err = miette::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let values = s
             .split_ascii_whitespace()
             .map(FromStr::from_str)
-            .collect::<Result<Vec<_>, _>>()?;
-        ensure!(
+            .collect::<Result<Vec<_>, _>>()
+            .into_diagnostic()?;
+        miette::ensure!(
             values.len() == 3,
             "The item specification line should have had 3 whitespace separated fields"
         );

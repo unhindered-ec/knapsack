@@ -12,7 +12,7 @@ use run::Run;
 
 // Turn some of this into CLI arguments.
 
-fn main() -> anyhow::Result<()> {
+fn main() -> miette::Result<()> {
     let knapsack = Knapsack::from_file_path("knapsacks/tiny.txt")?;
 
     println!("{knapsack:?}");

@@ -1,6 +1,8 @@
-use anyhow::{anyhow, Context};
+use anyhow::anyhow;
 use ec_core::population::Population;
 use ec_linear::genome::{bitstring::Bitstring, Linear};
+use miette::Context;
+use miette::IntoDiagnostic;
 use std::{
     fs::File,
     io::{self, BufRead},
@@ -57,8 +59,8 @@ impl Knapsack {
             .sum()
     }
 
-    pub fn from_file_path(file_path: impl AsRef<Path>) -> anyhow::Result<Self> {
-        let file = File::open(file_path.as_ref())?;
+    pub fn from_file_path(file_path: impl AsRef<Path>) -> miette::Result<Self> {
+        let file = File::open(file_path.as_ref()).into_diagnostic()?;
         let reader = io::BufReader::new(file);
 
         // First line is number of items
@@ -67,24 +69,27 @@ impl Knapsack {
         let mut line_iter = reader.lines();
         let num_items = line_iter
             .next()
-            .ok_or_else(|| anyhow!("The input file {:?} was empty", file_path.as_ref()))??
-            .parse::<usize>()?;
+            .ok_or_else(|| miette::miette!("The input file {:?} was empty", file_path.as_ref()))?
+            .into_diagnostic()?
+            .parse::<usize>()
+            .into_diagnostic()?;
         let items = line_iter
             .by_ref()
             .take(num_items)
             .map(|item_line_result| {
                 let line_str = item_line_result
+                    .into_diagnostic()
                     .context("Error reading line from knapsack specification file")?;
                 Item::from_str(&line_str)
             })
-            .collect::<anyhow::Result<Vec<_>>>()?;
+            .collect::<miette::Result<Vec<_>>>()?;
         let capacity = line_iter
             .next()
-            .ok_or_else(|| anyhow!(
+            .ok_or_else(|| miette::miette!(
                 "There was no capacity line in the input file {:?}\nThis might be because the number of items was set incorrectly.",
                 file_path.as_ref()
-            ))??
-            .parse()?;
+            ))?.into_diagnostic()?
+            .parse().into_diagnostic()?;
 
         Ok(Self { items, capacity })
     }
