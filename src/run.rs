@@ -40,20 +40,13 @@ pub struct Run<Scorer, Sel, Rec, Mut> {
     mutator: Mut,
 }
 
-#[expect(
-    clippy::unnecessary_wraps,
-    reason = "Temporarily allowing Result wrapper"
-)]
-#[expect(unused_variables, reason = "Temporarily allowing unused variables")]
-#[expect(unused_mut, reason = "We'll need `generation` to be mutable in a bit")]
 #[expect(clippy::match_bool, reason = "I like the `match` instead of `if`")]
-#[expect(clippy::todo, reason = "Todos are OK while we're working things out")]
 impl<Scorer, Sel, Rec, Mut> Run<Scorer, Sel, Rec, Mut>
 where
-    Scorer: IndividualScorer<Bitstring, Score: Clone>,
-    Sel: Selector<Vec<EcIndividual<Bitstring, Scorer::Score>>>,
-    Rec: Recombinator<[Bitstring; 2], Output = Bitstring>,
-    Mut: Mutator<Bitstring>,
+    Scorer: IndividualScorer<Bitstring, Score: Clone + Send + Sync> + Send + Sync,
+    Sel: Selector<Vec<EcIndividual<Bitstring, Scorer::Score>>> + Send + Sync,
+    Rec: Recombinator<[Bitstring; 2], Output = Bitstring> + Send + Sync,
+    Mut: Mutator<Bitstring> + Send + Sync,
 {
     pub fn execute(self) -> anyhow::Result<Vec<EcIndividual<Bitstring, Scorer::Score>>> {
         let mut rng = thread_rng();
@@ -92,7 +85,7 @@ where
         for generation_number in 0..self.max_generations {
             println!("Generation {generation_number}");
             match self.parallel_evaluation {
-                true => todo!(),
+                true => generation.par_next()?,
                 false => generation.serial_next()?,
             }
         }
@@ -102,32 +95,3 @@ where
         Ok(generation.population().clone())
     }
 }
-
-// These are the relevant parts of "executing" a run from the HIFF
-// example in `ec-linear`.
-/*
-   let population = Standard
-       .into_collection_generator(bit_length)
-       .with_scorer(scorer)
-       .into_collection_generator(population_size)
-       .sample(&mut rng);
-
-   let make_new_individual = Select::new(selector)
-       .apply_twice()
-       .then_map(GenomeExtractor)
-       .then(Recombine::new(TwoPointXo))
-       .then(Mutate::new(WithOneOverLength))
-       .wrap::<GenomeScorer<_, _>>(scorer);
-
-   let mut generation = Generation::new(make_new_individual, population);
-
-   for generation_number in 0..num_generations {
-       match run_model {
-           RunModel::Serial => generation.serial_next()?,
-           RunModel::Parallel => generation.par_next()?,
-       }
-
-       let best = Best.select(generation.population(), &mut rng)?;
-       println!("Generation {generation_number:2} best is {best}");
-   }
-*/
