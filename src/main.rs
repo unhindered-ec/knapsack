@@ -1,13 +1,11 @@
-
 use anyhow::Context;
-use cliff::CliffScorer;
 use ec_core::operator::selector::{best::Best, tournament::Tournament, Selector};
 use ec_linear::{
     mutator::with_one_over_length::WithOneOverLength, recombinator::uniform_xo::UniformXo,
 };
-use knapsack::Knapsack;
+use knapsack::run::Run;
+use knapsack::{cliff::CliffScorer, knapsack::Knapsack};
 use rand::thread_rng;
-use run::Run;
 
 // Turn some of this into CLI arguments.
 
@@ -20,12 +18,12 @@ fn main() -> anyhow::Result<()> {
     let run = Run::builder()
         .bit_length(knapsack.num_items())
         .population_size(100_000)
-        .max_generations(10)
+        .max_generations(1000)
         .scorer(CliffScorer::new(knapsack))
-        .selector(Tournament::binary())
+        .selector(Tournament::of_size::<100>())
         .recombinator(UniformXo)
         .mutator(WithOneOverLength)
-        .parallel_evaluation(false)
+        .parallel_evaluation(true)
         .build();
 
     let final_population = run.execute()?;
