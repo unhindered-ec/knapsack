@@ -4,21 +4,24 @@ use ec_core::{
     individual::{
         ec::{EcIndividual, WithScorer},
         scorer::Scorer as IndividualScorer,
+        Individual,
     },
     operator::{
         genome_extractor::GenomeExtractor,
         genome_scorer::GenomeScorer,
         mutator::{Mutate, Mutator},
         recombinator::{Recombinator, Recombine},
-        selector::{Select, Selector},
+        selector::{best::Best, Select, Selector},
         Composable,
     },
+    population::Population,
 };
 use ec_linear::genome::bitstring::Bitstring;
 use rand::{
-    distr::{Distribution, Standard},
+    distr::{Bernoulli, Distribution},
     thread_rng,
 };
+use std::fmt::Debug;
 use typed_builder::TypedBuilder;
 
 // TODO: What if we want to allow people to specify either a recombinator or a mutator
@@ -43,19 +46,29 @@ pub struct Run<Scorer, Sel, Rec, Mut> {
 #[expect(clippy::match_bool, reason = "I like the `match` instead of `if`")]
 impl<Scorer, Sel, Rec, Mut> Run<Scorer, Sel, Rec, Mut>
 where
-    Scorer: IndividualScorer<Bitstring, Score: Clone + Send + Sync> + Send + Sync,
+    Scorer: IndividualScorer<Bitstring> + Send + Sync,
+    Scorer::Score: Debug + Clone + Send + Sync + Ord,
     Sel: Selector<Vec<EcIndividual<Bitstring, Scorer::Score>>> + Send + Sync,
     Rec: Recombinator<[Bitstring; 2], Output = Bitstring> + Send + Sync,
     Mut: Mutator<Bitstring> + Send + Sync,
 {
+    /// # Errors
+    ///
+    /// This can return an error if:
+    ///    - The argument to the Bernoulli constructor is out of range
+    ///    - The population is empty at some point, so `Best::select` fails (this should
+    ///      never happen)
+    ///    - Creating a new generation fails, probably in creating or scoring new individuals
     pub fn execute(self) -> anyhow::Result<Vec<EcIndividual<Bitstring, Scorer::Score>>> {
         let mut rng = thread_rng();
 
         // Create the initial population for the run
         let population =
-            // `Standard` can be used to generate random booleans, which will be
-            // used below to generate the `Bitstring`s.
-            Standard
+            // `Bernoulli` can be used to generate random booleans with the
+            // given probability of bits being `true` A small probability
+            // creates initial bitstrings that are mostly `false`.
+            // Should become part of command line arguments.
+            Bernoulli::new(0.05)?
             // Generate a `Bitstring` of length `self.bit_length`
             .into_collection_generator(self.bit_length)
             // Adds a scorer to the `Bitstring`, creating an `Individual`
