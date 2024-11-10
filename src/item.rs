@@ -8,18 +8,22 @@ pub struct Item {
 }
 
 impl Item {
+    #[must_use]
     pub const fn new(id: u64, value: u64, weight: u64) -> Self {
         Self { id, value, weight }
     }
 
+    #[must_use]
     pub const fn id(&self) -> u64 {
         self.id
     }
 
+    #[must_use]
     pub const fn value(&self) -> u64 {
         self.value
     }
 
+    #[must_use]
     pub const fn weight(&self) -> u64 {
         self.weight
     }

@@ -9,6 +9,7 @@ pub struct CliffScorer {
 }
 
 impl CliffScorer {
+    #[must_use]
     pub const fn new(knapsack: Knapsack) -> Self {
         Self { knapsack }
     }

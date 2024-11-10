@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Context};
-use ec_core::population::Population;
-use ec_linear::genome::{bitstring::Bitstring, Linear};
+use ec_linear::genome::bitstring::Bitstring;
 use std::{
     fs::File,
     io::{self, BufRead},
@@ -17,18 +16,22 @@ pub struct Knapsack {
 }
 
 impl Knapsack {
-    pub fn new(items: Vec<Item>, capacity: u64) -> Self {
-        Knapsack { items, capacity }
+    #[must_use]
+    pub const fn new(items: Vec<Item>, capacity: u64) -> Self {
+        Self { items, capacity }
     }
 
+    #[must_use]
     pub fn items(&self) -> &[Item] {
         &self.items
     }
 
+    #[must_use]
     pub fn num_items(&self) -> usize {
         self.items.len()
     }
 
+    #[must_use]
     pub fn get_item(&self, index: usize) -> Option<&Item> {
         self.items.get(index)
     }
@@ -37,10 +40,12 @@ impl Knapsack {
         self.items.iter()
     }
 
+    #[must_use]
     pub const fn capacity(&self) -> u64 {
         self.capacity
     }
 
+    #[must_use]
     pub fn value(&self, choices: &Bitstring) -> u64 {
         self.items
             .iter()
@@ -49,6 +54,7 @@ impl Knapsack {
             .sum()
     }
 
+    #[must_use]
     pub fn weight(&self, choices: &Bitstring) -> u64 {
         self.items
             .iter()
@@ -57,6 +63,11 @@ impl Knapsack {
             .sum()
     }
 
+    /// # Errors
+    ///
+    /// This can fail if:
+    ///    - We fail to open the file, or
+    ///    - The file contents have the wrong format
     pub fn from_file_path(file_path: impl AsRef<Path>) -> anyhow::Result<Self> {
         let file = File::open(file_path.as_ref())?;
         let reader = io::BufReader::new(file);
