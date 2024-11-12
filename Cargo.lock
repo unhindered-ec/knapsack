@@ -191,6 +191,7 @@ dependencies = [
  "ec-linear",
  "miette",
  "rand 0.9.0-alpha.2",
+ "rayon",
  "test-case",
  "thiserror",
  "typed-builder",

@@ -15,6 +15,7 @@ ec-core = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "d
 ec-linear = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "dce7338aa6861ddc31e1f7c0601c1bf7fc3df664" }
 miette = { version = "7.2.0", features = ["fancy"] }
 rand = "0.9.0-alpha.2"
+rayon = "1.10.0"
 test-case = "3.3.1"
 thiserror = "1.0.64"
 typed-builder = "0.20.0"
