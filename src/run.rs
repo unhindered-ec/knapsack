@@ -21,6 +21,7 @@ use rand::{
     distr::{Bernoulli, Distribution},
     thread_rng,
 };
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::fmt::Debug;
 use typed_builder::TypedBuilder;
 
@@ -63,20 +64,7 @@ where
         let mut rng = thread_rng();
 
         // Create the initial population for the run
-        let population =
-            // `Bernoulli` can be used to generate random booleans with the
-            // given probability of bits being `true` A small probability
-            // creates initial bitstrings that are mostly `false`.
-            // Should become part of command line arguments.
-            Bernoulli::new(0.01)?
-            // Generate a `Bitstring` of length `self.bit_length`
-            .into_collection_generator(self.bit_length)
-            // Adds a scorer to the `Bitstring`, creating an `Individual`
-            .with_scorer(&self.scorer)
-            // Create a `Population` of `self.population_size` `Individual`s
-            .into_collection_generator(self.population_size)
-            // Actually sample the distribution to get the initial population.
-            .sample(&mut rng);
+        let population = self.initial_population(&mut rng)?;
 
         // Make an operator that takes a population and generates a new (child) individual.
         let child_maker =
@@ -118,6 +106,27 @@ where
         // When we add `Generation::into_population()` we should use that here,
         // avoiding the call to `.clone()`.
         Ok(generation.population().clone())
+    }
+
+    fn initial_population(
+        &self,
+        rng: &mut rand::prelude::ThreadRng,
+    ) -> anyhow::Result<Vec<EcIndividual<Bitstring, Scorer::Score>>> {
+        let population =
+            // `Bernoulli` can be used to generate random booleans with the
+            // given probability of bits being `true` A small probability
+            // creates initial bitstrings that are mostly `false`.
+            // Should become part of command line arguments.
+            Bernoulli::new(0.01)?
+            // Generate a `Bitstring` of length `self.bit_length`
+            .into_collection_generator(self.bit_length)
+            // Adds a scorer to the `Bitstring`, creating an `Individual`
+            .with_scorer(&self.scorer)
+            // Create a `Population` of `self.population_size` `Individual`s
+            .into_collection_generator(self.population_size)
+            // Actually sample the distribution to get the initial population.
+            .sample(rng);
+        Ok(population)
     }
 
     #[expect(
