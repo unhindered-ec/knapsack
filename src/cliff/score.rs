@@ -1,10 +1,11 @@
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
 pub enum CliffScore {
     // The derived implementation of `PartialOrd` will use the order of the
     // variants, with the top variants "smaller" than the lower variants.
     // By placing `Overloaded` before `Score`, we ensure that `Overloaded`
     // will always be less (i.e., worse) than any `Score`, which is what
     // we want.
+    #[default]
     Overloaded,
     Score(u64),
 }

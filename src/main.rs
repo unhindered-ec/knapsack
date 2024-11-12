@@ -13,7 +13,7 @@ fn main() -> anyhow::Result<()> {
     let knapsack = Knapsack::from_file_path("knapsacks/big.txt")
         .context("Failed to parse the knapsack file")?;
 
-    println!("{knapsack:?}");
+    // println!("{knapsack:?}");
 
     let run = Run::builder()
         .bit_length(knapsack.num_items())
@@ -29,9 +29,10 @@ fn main() -> anyhow::Result<()> {
     let final_population = run.execute()?;
 
     let mut rng = thread_rng();
-    let winner = Best.select(&final_population, &mut rng);
+    let winner = Best.select(&final_population, &mut rng)?;
 
-    println!("{winner:?}");
+    println!("Best overall score: {:?}", winner.test_results);
+    // println!("{winner:?}");
 
     Ok(())
 }

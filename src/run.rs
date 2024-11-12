@@ -47,7 +47,7 @@ pub struct Run<Scorer, Sel, Rec, Mut> {
 impl<Scorer, Sel, Rec, Mut> Run<Scorer, Sel, Rec, Mut>
 where
     Scorer: IndividualScorer<Bitstring> + Send + Sync,
-    Scorer::Score: Debug + Clone + Send + Sync + Ord,
+    Scorer::Score: Debug + Default + Clone + Send + Sync + Ord,
     Sel: Selector<Vec<EcIndividual<Bitstring, Scorer::Score>>> + Send + Sync,
     Rec: Recombinator<[Bitstring; 2], Output = Bitstring> + Send + Sync,
     Mut: Mutator<Bitstring> + Send + Sync,
@@ -68,7 +68,7 @@ where
             // given probability of bits being `true` A small probability
             // creates initial bitstrings that are mostly `false`.
             // Should become part of command line arguments.
-            Bernoulli::new(0.05)?
+            Bernoulli::new(0.01)?
             // Generate a `Bitstring` of length `self.bit_length`
             .into_collection_generator(self.bit_length)
             // Adds a scorer to the `Bitstring`, creating an `Individual`
@@ -94,17 +94,26 @@ where
             .wrap::<GenomeScorer<_, _>>(&self.scorer);
 
         let mut generation = Generation::new(child_maker, population);
+        let mut best_score = Scorer::Score::default();
 
         for generation_number in 0..self.max_generations {
             println!("Generation {generation_number}");
             let best = Best.select(generation.population(), &mut rng)?;
+            if best.test_results > best_score {
+                best_score = best.test_results.clone();
+            }
             println!("   Best score: {:?}", best.test_results);
-            println!("   Entropy: {:?}", Self::entropy(generation.population()));
+            // println!("   Entropy: {:?}", Self::entropy(generation.population()));
             match self.parallel_evaluation {
                 true => generation.par_next()?,
                 false => generation.serial_next()?,
             }
         }
+
+        let best = Best.select(generation.population(), &mut rng)?;
+        println!("   Best score: {:?}", best.test_results);
+        println!("   Entropy: {:?}", Self::entropy(generation.population()));
+        println!("   Best overall: {best_score:?}");
 
         // When we add `Generation::into_population()` we should use that here,
         // avoiding the call to `.clone()`.
