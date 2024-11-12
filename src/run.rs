@@ -103,7 +103,7 @@ where
                 best_score = best.test_results.clone();
             }
             println!("   Best score: {:?}", best.test_results);
-            // println!("   Entropy: {:?}", Self::entropy(generation.population()));
+            println!("   Entropy: {:?}", Self::entropy(generation.population()));
             match self.parallel_evaluation {
                 true => generation.par_next()?,
                 false => generation.serial_next()?,
@@ -130,13 +130,14 @@ where
     )]
     fn entropy(population: &[EcIndividual<Bitstring, Scorer::Score>]) -> f64 {
         let pop_size = population.len();
-        // Compute the mean of each bit position
-        // Sum up (mean * log_2(mean) + (1-mean)* log_2(1- mean)) across each position.
+        // To compute the entropy of the set of bitstrings:
+        //    - Compute the mean of each bit position
+        //    - Then sum up (mean * log_2(mean) + (1-mean)* log_2(1- mean)) across each position.
         let bitstrings = population
             .iter()
             .map(EcIndividual::genome)
             .collect::<Vec<_>>();
-        let means = (0..bitstrings[0].bits.size()).map(|index| {
+        let means = (0..bitstrings[0].bits.size()).into_par_iter().map(|index| {
             bitstrings
                 .iter()
                 .filter(|bitstring| bitstring.bits[index])
