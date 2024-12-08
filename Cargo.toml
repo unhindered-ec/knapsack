@@ -11,9 +11,9 @@ categories = ["evolutionary computation", "genetic algorithms", "combinatorial o
 
 [dependencies]
 anyhow = "1.0.89"
-ec-core = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "dce7338aa6861ddc31e1f7c0601c1bf7fc3df664" }
-ec-linear = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "dce7338aa6861ddc31e1f7c0601c1bf7fc3df664" }
-miette = { version = "7.2.0", features = ["fancy"] }
+ec-core = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "c1fa73c583b51bd53bf75785f494a4f99f9493b0" }
+ec-linear = { git = "https://github.com/unhindered-ec/unhindered-ec.git", rev = "c1fa73c583b51bd53bf75785f494a4f99f9493b0" }
+miette = { version = "7.4.0", features = ["fancy"] }
 rand = "0.9.0-alpha.2"
 rayon = "1.10.0"
 test-case = "3.3.1"
